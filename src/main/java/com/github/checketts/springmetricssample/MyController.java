@@ -28,12 +28,11 @@ public class MyController {
   List<String> people = new ArrayList<>();
   Counter steveCounter;
   Timer findPersonTimer;
-  Timer schedTimer;
 
   @Scheduled(fixedRate = 5000)
-  @Timed(extraTags = {"name", "bob"})
+  @Timed(value = "sample_bob_scheduled", extraTags = {"name", "bob"})
   public void runMe() {
-    schedTimer.record(() -> LOG.info("Running the runMe"));
+    LOG.info("Running the runMe");
   }
 
   public MyController(MeterRegistry registry,
@@ -50,8 +49,6 @@ public class MyController {
 
     // register a timer -- though for request timing it is easier to use @Timed
     findPersonTimer = registry.timer("http_requests", "method", "GET");
-
-    schedTimer = registry.timer("sample_bob_scheduled");
   }
 
   @GetMapping("/api/person")
@@ -70,8 +67,7 @@ public class MyController {
       });
     }
 
-
-    return findPersonTimer.recordThrowable(() -> { // use the timer!
+    return findPersonTimer.record(() -> { // use the timer!
       if (q.toLowerCase().contains("steve")) {
         steveCounter.increment(); // use the counter
       }
