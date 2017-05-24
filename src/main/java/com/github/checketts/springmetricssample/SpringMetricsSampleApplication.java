@@ -24,14 +24,14 @@ public class SpringMetricsSampleApplication {
         ThreadPoolTaskExecutor exec = new ThreadPoolTaskExecutor();
         exec.setCorePoolSize(10);
         exec.setMaxPoolSize(10);
-        exec.initialize();
-
-        // must be done after initialize(), yikes
-        registry.monitor("tp_exec_exec", exec.getThreadPoolExecutor());
 
         // this demonstrates how to instrument any arbitrary runnable that you run across in application code,
         // but is not strictly necessary here as we have already monitored every task going to the executor above
+        // Must be done before initialize
         exec.setTaskDecorator(f -> registry.timer("tp_exec").wrap(f));
+
+        // must be done after initialize(), yikes
+        //Change the monitor to watch executor registry.monitor("tp_exec_exec", exec.getThreadPoolExecutor());
 
         return exec;
     }
